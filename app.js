@@ -151,7 +151,7 @@ io.on('connection',function(client){
 //	})
 	
 	client.on('saa',function(){
-		weather.haeData(client,"Turku");
+		weather.haeData(client,"Kaarina");
 	});
 	
 	client.on('aikataulu',function(nada){
