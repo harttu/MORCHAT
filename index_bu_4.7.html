@@ -1,0 +1,151 @@
+<html>
+<head>
+	<link rel="stylesheet" type="text/css" href="tyylit.css">
+</head>
+<body>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+<script src="http://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+
+<div class="grid-container outline">
+	<div class="row">
+		<div class="col-80"><p>80</p></div>
+		<div class="col-20"><p>20</p></div>
+		
+	</div>
+	<div class="row">
+		<div class="col-20"><textarea id="nicklist" readonly></textarea>
+		</div>
+		<div class="col-80"><textarea id="chat_room" rows="10" cols="50" readonly>
+		</textarea>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-50">
+			<form id="change_nick">
+				Change nick:
+				<input type="text" id="nick_input">Change:
+				<input type="submit" value="Vaihda">
+			</form>
+		</div>
+		<div class="col-50">
+			<form id="chat_form">
+				Chat Input:
+				<input type="text" name="chat_input" id="chat_input">Send:
+				<input type="submit" value="Lähetä">
+			</form>
+		</div>
+	</div>
+</div>
+
+<!-- Angularilla:
+<div class="grid-container outline">
+	<div class="row">
+		<div class="col-10"></div>
+		<div class="col-10"></div>
+		<div class="col-10"></div>
+		<div class="col-10"></div>		
+	</div>
+</div>
+-->
+<textarea id="saa" readonly>
+</textarea>
+
+
+<textarea id="aikataulu" readonly>
+</textarea>
+<script>
+var esitaSaa = function(saa){
+	
+	
+}
+
+console.log("scriptin alku");
+var socket = io.connect('http://localhost:8080');
+
+$('#saa').hover(function(c){
+	console.log("Hoover saa");
+//$('#saa').val("PO");	
+socket.emit('saa');
+});
+
+socket.on('saa',function(data){
+	console.log("Sain dataa"+data);
+	esitaSaa(data);
+	
+	$('#saa').val("kuva:"+data.kuva);
+		$('.saa').val(data);
+	});
+
+
+
+
+$('#aikataulu').hover(function(c){
+	console.log("Hoover: lähetä aikataulu pyyntö");
+//$('#aikataulu').val("PO");	
+socket.emit('aikataulu');
+});
+
+socket.on('aikataulu',function(data){
+	console.log("Sain dataa"+data);
+	$('#aikataulu').val(data);
+		$('.aikataulu').val(data);
+	
+	});
+
+var insertMessage = function(data){
+	$('#chat_room').val($('#chat_room').val()+"\n"+data.nickname+" > "+data.data); // copy the existing value add newline and the new comment
+};
+
+
+socket.on('messages',function(data){
+	insertMessage(data); 
+});
+
+socket.on('connect',function(reserved_nicks){
+	$('#status').html('Connected to chattr');
+	//reserved_nicks.forEach(function(name){ console.log(name)});
+	//nickname = prompt("What is your nickname?");
+	//socket.emit('join',nickname);
+});
+
+socket.on('newNickList',function(list){
+	var temp = "";
+	list.forEach(function(data){
+		temp = temp+" "+data;
+	});
+	$('#nicklist').val(temp);
+	
+});
+
+socket.on('setNick',function(nick){
+	nickname = nick;
+	insertMessage({nickname:nickname,data:" is your nick now"});
+	socket.emit('join',nickname);
+});
+
+$('#change_nick').submit(function(e){
+	console.log("Nickiä vaihtamassa");
+	var nick = $('#nick_input').val();
+	socket.emit('changeNick',nick);
+	nickname = nick;
+	//insertMessage({nickname:nickname,data:message});
+	e.preventDefault();
+});
+
+
+$('#chat_form').submit(function(e){
+	console.log("Submitoitu");
+	var message = $('#chat_input').val();
+	socket.emit('messages',{nickname:nickname,data:message});
+	//insertMessage({nickname:nickname,data:message});
+	e.preventDefault();
+});
+	
+
+
+</script>
+
+</body>
+</html>

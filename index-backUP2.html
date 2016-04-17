@@ -1,0 +1,282 @@
+<html lang="fi" ng-app="myApp">
+<head>
+	<meta charset="utf-8"/>
+	<link rel="stylesheet" type="text/css" href="tyylit.css">
+</head>
+<body ng-app="myApp" ng-controller="myCtrl">
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+<script src="http://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+<script src= "http://ajax.googleapis.com/ajax/libs/angularjs/1.3.14/angular.min.js"></script>
+
+<div class="grid-main">
+<div class="grid-container outline">
+	<div class="row">
+		<div class="col-100"><p id="otsikko">The Underground Morbacka Channel</p></div>
+	</div>
+	<div class="row">
+		<div class="col-20"><textarea id="nicklist"></textarea>
+		</div>
+		<div class="col-80"><textarea id="chat_room" rows="10" cols="50">
+		</textarea>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-20">
+			<form id="change_nick">
+				<input type="text" placeholder="Vaihda nick" id="nick_input" maxlength="10">
+				<input type="submit" value="Vaihda">
+			</form>
+		</div>
+		<div class="col-80">
+			<form id="chat_form">
+				<input type="text" name="chat_input" id="chat_input">
+				<input type="submit" id="chat_form_submit" value="Lähetä">
+			</form>
+		</div>
+	</div>
+</div>
+
+
+<div class="grid-container outline grid-pikku" ng-app="myApp" ng-controller="myCtrl">
+	<div class="row">
+		<div class="col-100">
+			<p id="date">{{inFinnishDays[ww]}} {{dd}}. {{inFinnishMonths[mm]+"ta"}}</p></div>
+		</div>
+	<div class="row">
+		<div class="col-100">
+			<p>Lähipäivien sää Turussa</p>
+		</div>
+	<div class="row" id="saa" ng-repeat="k in saa track by $index">
+		<div class="col-10">{{inFinnishDays[(k.paiva + ww) % 7]}}</div>
+		<div class="col-50">{{k.teksti}}</div>
+		<div class="col-30"><img src="{{k.kuva}}"></img></div>
+		<div class="col-5">{{k.min}}</div>
+		<div class="col-5">{{k.max}}</div>		
+	</div>
+	<div class="row">
+		<div class="col-100"><p>110 tien bussit Turkuun</p></div>
+	</div>
+	<div class="row">
+		<div class="col-30">Aika</div>
+		<div class="col-30">Linja</div>
+		<div class="col-40">Määränpää</div>
+	<div>
+	<div class="row" id="bussi" ng-repeat="j in linjat track by $index">
+		<div class="col-30">{{j.aika}}</div>
+		<div class="col-30">{{j.linja}}</div>
+		<div class="col-40">{{j.maaranpaa}}</div>
+	</div>
+</div>
+</div> <!-- MAIN DIV ENDS -->
+
+<script>
+var today = new Date();
+var dd = today.getDate();
+var ww = today.getDay();
+var mm = today.getMonth();
+
+var inFinnishDays = ["Sunnuntai","Maanantai", "Tiistai", "Keskiviikko", "Torstai","Perjantai","Lauantai"];
+var inFinnishMonths = ["Tammikuu","Helmikuu","Maaliskuu","Huhtikuu","Toukokuu","Kesäkuu", "Heinäkuu", "Elokuu", "Syyskuu","Lokakuu","Marraskuu","Joulukuu"];
+
+var saa = [{paiva:0,kuva:"k1", teksti:"T1", min:12,max:16}, {paiva:1,kuva:"k2", teksti:"T2", min:45,max:90}, {paiva:2,kuva:"k3", teksti:"T3", min:12,max:34}];
+
+var linjat = [{aika:"",linja:"",maaranpaa:""}];//,{aika:"45:234",linja:"234",maaranpaa:"Åbo"},{aika:"34.23",linja:"dfgdgf",maaranpaa:"Pargas"}];
+var app = angular.module("myApp",[]);
+
+app.controller('myCtrl',['$scope', function($scope){
+	$scope.saa = saa;
+	$scope.dd = dd;
+	$scope.ww = ww;
+	$scope.mm = mm;
+	$scope.inFinnishDays = inFinnishDays;
+	$scope.inFinnishMonths = inFinnishMonths;
+	$scope.linjat = linjat;
+}]);
+
+
+var esitaSaa = function(saa){
+	
+	
+}
+
+console.log("scriptin alku");
+
+// INIT
+// Initializing. Empty the chat room
+//
+$('#chat_room').val("");    // Empty the chat room
+
+var socket = io.connect(location.host);
+socket.emit('aikataulu');	// Request for timetables
+socket.emit('saa');			// Request for weather
+
+setInterval(function(){
+	socket.emit('aikataulu');	// Request for timetables
+},5 * 60 * 1000);	// every second minute
+
+setInterval(function(){
+	socket.emit('saa');	// Request for timetables
+},60 * 60 * 1000);  // once in an hour
+
+$('#saa').hover(function(c){
+//	console.log("Hoover saa");
+//$('#saa').val("PO");	
+//socket.emit('saa');
+});
+
+
+
+$('#aikataulu').hover(function(c){
+//	console.log("Hoover: lähetä aikataulu pyyntö");
+//$('#aikataulu').val("PO");	
+//socket.emit('aikataulu');
+});
+
+//
+// Listen for weather information. Empty the global weather variable. Update it and tell angular to refresh its part of the page.
+//
+socket.on('saa',function(data){
+	console.log("Sain dataa"+data);
+	
+	// For debugging
+	/*
+	for(var i = 0; i < data.length; i++)
+	{
+		console.log("Alkion "+i+" DATA tiedot :"+data[i].teksti+":"+data[i].kuva+":"+data[i].min+":"+data[i].max+":");
+	}
+	*/
+	saa.length = 0;
+	
+	for(var i = 0;i< data.length;i++)
+	{
+		saa.push(data[i]);
+	}
+	/*
+	for(var i = 0;i < data.length;i++)
+	{
+		console.log("Alkion "+i+" SAA tiedot :"+saa[i].teksti+":"+saa[i].kuva+":"+saa[i].min+":"+saa[i].max+":");
+	}
+	*/
+	$('#saa').scope().$apply(); 
+});
+
+//
+// Listen for timetable data. Empty the global variable designed to handle it. 
+//
+socket.on('aikataulu',function(data){
+	console.log("Sain dataa"+data);
+	linjat.length = 0;
+	for(var i = 0;i< data.length;i++)
+	{
+		linjat.push(data[i]);
+	}
+	console.log("Data sisältää:"+data[0].maaranpaa);
+	$('#bussi').scope().$apply();
+});
+/*
+$('body').on('click',function(e){ 
+	linjat.push({maaranpaa:"sfsdf"});
+	console.log("Linjat sisältää:"+linjat[0].maaranpaa);
+	socket.emit('aikataulu');
+});
+*/
+
+//
+// Copies the existing message on the chat room. Appends the new one to it and writes it to the chat room
+//
+var insertMessage = function(data){
+	$('#chat_room').val($('#chat_room').val()+"\n"+data.nickname+" > "+data.data); // copy the existing value add newline and the new comment
+};
+
+//
+// Listen for messages. Redirects them to the chat room
+//
+socket.on('messages',function(data){
+	insertMessage(data); 
+//	$('#chat_room').scrollTop = $('#chat_room').scrollHeight
+ var psconsole = $('#chat_room');
+    if(psconsole.length)
+       psconsole.scrollTop(psconsole[0].scrollHeight - psconsole.height());
+//	var textarea = document.getElementById('chat_room');
+//	textarea.scrollTop = textarea.scrollHeight;
+});
+
+socket.on('connect',function(reserved_nicks){
+	$('#status').html('Connected to chattr');
+	//reserved_nicks.forEach(function(name){ console.log(name)});
+	//nickname = prompt("What is your nickname?");
+	//socket.emit('join',nickname);
+});
+
+//
+// Updates the nicks names. 
+//
+socket.on('newNickList',function(list){
+	var temp = "";
+	list.forEach(function(data){
+		temp = temp+"\n"+data;
+	});
+	$('#nicklist').val(temp);
+	
+});
+
+//
+// Nick is not good
+//
+
+
+//
+// A new nick is received from the server
+//
+socket.on('setNick',function(nick,suc){
+	console.log("Serveri vastasi nick kyselyyn argumentein:"+nick+": ja :"+suc+":");
+	if(suc === 0)//!isNaN(suc))											// if the suc varible is a string, do the following
+	{
+		console.log("Ei käy");
+		insertMessage({nickname:"Server",data:"Nick too long"});
+	}
+	else if(suc === 1)
+	{
+		nickname = nick;
+		insertMessage({nickname:"Server",data:nick+" is your nick now"});
+		// Get new nickname list
+		//socket.emit('join',nickname);
+	}
+	else if(suc === 2)
+	{
+		console.log("Ei käy");
+		insertMessage({nickname:"Server",data:"Nick on jo käytössä!"});
+	}
+	else
+	{
+		console.log("JOTAIN PIELESSÄ");
+	}
+});
+
+$('#change_nick').submit(function(e){
+	console.log("Nickiä vaihtamassa");
+	var nick = $('#nick_input').val();  // Store the new nick candidate
+	socket.emit('changeNick',nick);		// Send the candidate to the server
+	//nickname = nick;
+	//insertMessage({nickname:nickname,data:message});
+	e.preventDefault();
+});
+
+
+$('#chat_form').submit(function(e){
+	console.log("Submitoitu");
+	var message = $('#chat_input').val();
+	socket.emit('messages',{nickname:nickname,data:message});
+	$('#chat_input').val("")
+	//insertMessage({nickname:nickname,data:message});
+	e.preventDefault();
+});
+	
+
+
+</script>
+
+</body>
+</html>

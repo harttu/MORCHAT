@@ -1,0 +1,152 @@
+<html lang="fi" ng-app="myApp">
+<head>
+	<meta charset="utf-8"/>
+	<link rel="stylesheet" type="text/css" href="tyylit.css">
+	<link rel="stylesheet" type="text/css" href="fontit.css">
+</head>
+<body ng-controller="myCtrl">
+
+<script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+<script src="http://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+<script src= "http://ajax.googleapis.com/ajax/libs/angularjs/1.3.14/angular.min.js"></script>
+
+<!--
+<div class="grid-main" ng="myApp" ng-controller="myCtrl">
+	<div class="row">
+		<div class="col-50"><p id="otsikko">The underground Morbacka channel</p></div>
+		<div class="col-50"><p id="date">{{inFinnishDays[ww]}} {{dd}}. {{inFinnishMonths[mm]+"ta"}}</p></div>
+	</div>
+</div>
+-->
+</div>
+<div class="grid-main">
+<div class="grid-container outline">
+	<div class="row">
+		<div class="col-100"><p id="otsikko">The Underground Morbacka Channel</p></div>
+	</div>
+	<div class="row">
+		<div class="col-20"><textarea id="nicklist">Jukka</textarea>
+		</div>
+		<div class="col-80"><textarea id="chat_room" rows="10" cols="50">sdfsfkjskdfjslkjfsldkfjslkfdjslkdfj
+		</textarea>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-20">
+			<form id="change_nick">
+				<input type="text" placeholder="Vaihda nick" id="nick_input" maxlength="10">
+				<input type="submit" value="Vaihda">
+			</form>
+		</div>
+		<div class="col-80">
+			<form id="chat_form">
+				<input type="text" name="chat_input" id="chat_input">
+				<input type="submit" id="chat_form_submit" value="Lähetä">
+			</form>
+		</div>
+	</div>
+</div>
+
+
+<div class="grid-container outline grid-pikku" ng-app="myApp" ng-controller="myCtrl">
+	<div class="row">
+		<div class="col-100">
+			<p id="date">{{inFinnishDays[ww]}} {{dd}}. {{inFinnishMonths[mm]+"ta"}}</p></div>
+		</div>
+	<div class="row">
+		<div class="col-100">
+			<p>Lähipäivien sää Turussa</p>
+		</div>
+	<div class="row" ng-repeat="k in saa">
+		<div class="col-10">{{k.paiva}}</div>
+		<div class="col-10">{{k.teksti}}</div>
+		<div class="col-10">{{k.kuva}}</div>
+		<div class="col-10">{{k.min}}</div>
+		<div class="col-10">{{k.max}}</div>		
+	</div>
+	<div class="row">
+		<div class="col-100"><p>110 tien bussit Turkuun</p></div>
+	</div>
+	<div class="row">
+		<div class="col-30">Aika</div>
+		<div class="col-30">Linja</div>
+		<div class="col-40">Määränpää</div>
+	<div>
+	<div id="bussi" class="row" ng-repeat="j in linjat">
+		<div class="col-30">{{j.aika}}</div>
+		<div class="col-30">{{j.linja}}</div>
+		<div class="col-40">{{j.maaranpaa}}</div>
+	</div>
+</div>
+</div> <!-- MAIN DIV ENDS -->
+<script ng-controller="myCtrl">
+var today = new Date();
+var dd = today.getDate();
+var ww = today.getDay();
+var mm = today.getMonth();
+
+var inFinnishDays = ["Sunnuntai","Maanantai", "Tiistai", "Keskiviikko", "Torstai","Perjantai","Lauantai"];
+var inFinnishMonths = ["Tammikuu","Helmikuu","Maaliskuu","Huhtikuu","Toukokuu","Kesäkuu", "Heinäkuu", "Elokuu", "Syyskuu","Lokakuu","Marraskuu","Joulukuu"];
+
+var saa = [{paiva:"Pe",kuva:"k1", teksti:"T1", min:12,max:16}, {paiva:"La",kuva:"k2", teksti:"T2", min:45,max:90}, {paiva:"Su",kuva:"k3", teksti:"T3", min:12,max:34}];
+
+var linjat = [{aika:"t1",linja:"l2",maaranpaa:"Turk"},{aika:"45:234",linja:"234",maaranpaa:"Åbo"},{aika:"34.23",linja:"dfgdgf",maaranpaa:"Pargas"}];
+var app = angular.module("myApp",[]);
+app.controller('myCtrl',function($scope){
+	$scope.saa = saa;
+	$scope.dd = dd;
+	$scope.ww = ww;
+	$scope.mm = mm;
+	$scope.inFinnishDays = inFinnishDays;
+	$scope.inFinnishMonths = inFinnishMonths;
+	$scope.linjat = linjat;
+
+});
+
+
+
+$('#aikataulu').hover(function(c){
+	console.log("Hoover");
+$('#aikataulu').val("PO");	
+	
+});
+
+
+$('body').on('click',function(){ 
+	linjat.push({aika:"t1",linja:"l2",maaranpaa:"Turk123"});
+	console.log("Linjat sisältää:"+linjat.length);
+	console.log("Linjat sisältää:"+linjat[0].maaranpaa);
+	$('#bussi').scope().$apply() 
+});
+
+
+
+var insertMessage = function(data){
+	$('#chat_room').val($('#chat_room').val()+"\n"+data.nickname+" > "+data.data); // copy the existing value add newline and the new comment
+};
+
+
+
+
+$('#change_nick').submit(function(e){
+	console.log("Nickiä vaihtamassa");
+	saa.push({min:22,max:22});
+	$('#a_1_1').html("PO");
+	console.log("Saa on nyt "+saa)	
+	e.preventDefault();
+});
+
+
+$('#chat_form').submit(function(e){
+	console.log("Submitoitu");
+	var message = $('#chat_input').val();
+	socket.emit('messages',{nickname:nickname,data:message});
+	//insertMessage({nickname:nickname,data:message});
+	e.preventDefault();
+});
+
+
+</script>
+
+</body>
+</html>

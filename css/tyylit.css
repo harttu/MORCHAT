@@ -1,0 +1,134 @@
+
+.grid-main {
+	width:100%;
+	
+}
+
+.grid-container{
+    width: 70%;
+    max-width: 1200px;      
+	float:left;
+}
+
+/* set the border box on all elements inside the grid*/
+.grid-container *{
+	box-sizing:border-box;  /*   ilman tätä columnit eivät pysy riveillään*/
+}
+
+.grid-pikku {
+	width:30%;
+	max-width:800px;
+	float:right;
+}
+
+/*-- our cleafix hack -- */ 
+.row:before, 
+.row:after {
+    content:"";
+      display: table ;
+    clear:both;
+}
+
+[class*='col-'] {
+    float: left; 
+    min-height: 1px; 
+    width: 20.00%; 
+    /*-- our gutter -- */
+    padding: 8px; 
+    background-color: rgb(250,200,7);
+}
+
+.col-1{ width: 100.00%; }
+.col-2{ width: 50%; }
+.col-3{ width: 33.33%;    }
+.col-4{ width: 25.00%; }
+.col-5{ width: 20.00%; }
+
+.col-100{ width: 100.00%; }
+.col-80{ width: 80.00% }
+.col-75{ width: 75.00%; }
+.col-50{ width: 50.00%;    }
+.col-25{ width: 25.00%; }
+.col-20{ width: 20.00%; }
+.col-10{ width: 10.00% }
+
+
+
+
+.outline, .outline *{
+    outline: 0px solid #FFFFCC; 
+}
+
+/*-- some extra column content styling --*/
+
+[class*='col-'] > p {
+ background-color: rgb(250,200,50); 
+ padding: 0;
+ margin: 0;
+ text-align: center; 
+ 
+ font-weight:bold;
+}
+
+
+#otsikko{
+text-align:justify;
+ font-size: 1.5em;
+ font-style:italic;
+ font-family: Tahoma, Geneva, sans-serif;
+
+}
+
+#date{
+text-align:right;
+font-size:1em;
+font-family: Tahoma, Geneva, sans-serif;
+}
+
+
+textarea {
+    background-color:  rgb(250,200,50);
+    text-decoration-color: rgb(230,230,56);
+    font-size: 1.2em;
+    width:100%;
+    height: 60%;
+    border:solid 1px orange;
+    color:rgb;
+    font-family: "Comic sans",Tahoma,serif;
+    font-kerning: auto;
+    letter-spacing: 0.06em;
+}
+input{
+    background-color: orange;/*rgb(30,140,200);*/
+    color:black;/*rgb(30,140,200);/*orange;*/
+    font-size:medium;
+    font-style:oblique;
+    width=100%;
+    size=50;
+    letter-spacing: 0.05em;
+    
+    
+}
+input#chat_input{
+    width: 79%
+}
+
+input#nick_input{
+    width:65%;
+    font-size: 0.8em;
+}
+input[type=submit]{
+    display:inline-block;
+    font-size: 0.6em;
+    width: 30%;
+}
+
+input#chat_form_submit{
+    display:inline-block;
+    text-transform: uppercase;
+    width: 20%;
+}
+
+body{
+        background-color: rgb(250,200,50);
+}

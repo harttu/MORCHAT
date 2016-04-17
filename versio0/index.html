@@ -1,0 +1,57 @@
+<html>
+<head>
+	
+</head>
+<body>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+<script src="http://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+
+<textarea id="chat_room" rows="10" cols="50" readonly>
+</textarea>
+
+<form id="chat_form">
+	Chat Input:
+	<input type="text" name="chat_input" id="chat_input">Send:
+	<input type="submit" value="Submit">
+</form>
+
+<script>
+
+var insertMessage = function(data){
+	$('#chat_room').val($('#chat_room').val()+"\n"+data.nickname+" > "+data.data); // copy the existing value add newline and the new comment
+};
+
+
+var socket = io.connect('http://localhost:8080');
+	socket.on('messages',function(data){
+	insertMessage(data); 
+});
+
+socket.on('connect',function(reserved_nicks){
+	$('#status').html('Connected to chattr');
+	//reserved_nicks.forEach(function(name){ console.log(name)});
+	nickname = prompt("What is your nickname?");
+	socket.emit('join',nickname);
+});
+
+socket.on('bad_nick',function(data){
+	nickname = prompt("That nickname was already taken, pick up a new one.");
+	socket.emit('join',nickname);
+	
+});
+
+$('#chat_form').submit(function(e){
+	console.log("Submitoitu");
+	var message = $('#chat_input').val();
+	socket.emit('messages',{nickname:nickname,data:message});
+	//insertMessage({nickname:nickname,data:message});
+	e.preventDefault();
+});
+
+
+</script>
+
+</body>
+</html>
